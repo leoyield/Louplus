@@ -28,7 +28,7 @@ class Calculator:
         try:
             with open(cfg_file, 'r') as f:
                 for i in f.readlines():
-                    cfg[i.split('=')[0].strip()] = int(float(i.split('=')[1].strip()))
+                    cfg[i.split('=')[0].strip()] = float(i.split('=')[1].strip())
             with open(user_file, 'r') as f:
                 for i in f.readlines():
                     user[i.split(',')[0]] = int(float(i.split(',')[1]))
@@ -38,8 +38,8 @@ class Calculator:
 
     def calculat(self, cfg, user):
         #cfg, user = self.cfg_udata()
-        uid = user.keys()[0]
-        b_tax = user.values()[0]
+        
+        b_tax = user
         ratio =  (cfg['YangLao'] + cfg['YiLiao']
                   + cfg['ShiYe'] + cfg['GongShang']
                   + cfg['ShengYu'] + cfg['GongJiJin'])
@@ -65,15 +65,15 @@ class Calculator:
         elif i_tax > 80000:
             tax = i_tax * 0.45 - 15160
         a_tax = i_tax - tax
-        return uid, b_tax, SheBao, tax, a_tax
+        return b_tax, SheBao, tax, a_tax
 
     def write(self):
         cfg, user, gongzi_file = self.cfg_udata()
         try:
             with open(gongzi_file, 'w') as f:
                 for i in user:
-                    a, b, c, d, e = self.calculat(cfg, user[i])
-                    data = '{},{},{:.2f},{:.2f},{:.2f}\n'.format(a,b,c,d,e)
+                    a, b, c, d = self.calculat(cfg, user[i])
+                    data = '{},{},{:.2f},{:.2f},{:.2f}\n'.format(i,a,b,c,d)
                     f.write(data)
         except:
             return 'error'
