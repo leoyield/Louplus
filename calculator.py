@@ -67,7 +67,7 @@ class Calculator:
                 tax = i_tax * 0.35 - 7160
             elif i_tax > 80000:
                 tax = i_tax * 0.45 - 15160
-            a_tax = i_tax - tax
+            a_tax = b_tax - tax - SheBao
             data_user.append('{},{},{:.2f},{:.2f},{:.2f}\n'.format(user, b_tax, SheBao, tax, a_tax))
         self.queue2.put([data_user, gongzi_file])
         
