@@ -1,7 +1,8 @@
 {% block body %}
 <div>
-    <h1>title: {{ data.title }}</h1>
-    <p>created_time: {{ data.created_time }}</p>
-    <p>content: {{ data.content }}</p>
+    <h1>title: {{ data[0][1] }}</h1>
+    <p>category: {{ name[0] }}</p>
+    <p>created_time: {{ data[0][2] }}</p>
+    <p>content: {{ data[0][4] }}</p>
 </div>
 {% endblock %}
