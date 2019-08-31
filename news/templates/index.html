@@ -1,3 +1,8 @@
 {% for i, t in file_list %}
-<p><a href={{ url_for('file', file_id=i) }}> {{ t }} </a></p>
+<h1><a href={{ url_for('file', file_id=i) }}> {{ t }} </a></h1>
+<p>
+{% for x in tagdb.find_one({'id': i})['tag'] %}
+<span> {{ x }} </span>
+{% endfor %}
+</p>
 {% endfor %}
