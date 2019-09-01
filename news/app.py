@@ -86,7 +86,15 @@ def inset_data():
 def index():
     file_list = db.engine.execute('select id, title from file').fetchall()
     tagdb = mgdb.tag
-    return render_template('index.html', file_list=file_list, tagdb=tagdb)
+    tag_list = []
+    for i in mgdb.tag.find():
+        for x in i['tag']:
+            if x in tag_list:
+                continue
+            else:
+                tag_list.append(x)
+    return render_template('index.html', file_list=file_list, tagdb=tagdb,
+            tag_list=tag_list)
 
 @app.route('/files/<file_id>')
 def file(file_id):

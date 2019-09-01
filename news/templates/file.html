@@ -1,1 +1,11 @@
 {% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <h1>title: {{ data[0][1] }}</h1>
+     <p>category: {{ name[0] }}</p>
+     <p>created_time: {{ data[0][2] }}</p>
+     <p>content: {{ data[0][4] }}</p>
+ </div>
+ {% endblock %}
+
