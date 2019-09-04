@@ -5,20 +5,32 @@ import scrapy
 class RepositorySpider(scrapy.Spider):
     name = 'repository'
     #allowed_domains = ['github.com']
-    @property
-    def start_urls(self):
-        url_list = [
-                'https://github.com/shiyanlou?before=Y3Vyc29yOnYyOpK5MjAxNy0wNi0wN1QwODowNjoxMSswODowMM4FkpTJ&tab=repositories',
-                'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNy0wNi0wN1QwODowNjo1MyswODowMM4FkpKN&tab=repositories',
-                'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNS0wMS0zMVQyMDoyMDowMiswODowMM4BzHi1&tab=repositories',
-                'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNC0xMi0wNFQwMDoxNzo1MyswODowMM4BpCnu&tab=repositories',
-                'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNC0wOS0xNlQxMDowNjowMyswODowMM4Bb3Ud&tab=repositories'
-                ]
-        return url_list
+    start_urls = ['https://github.com/shiyanlou?tab=repositories']
 
     def parse(self, response):
         for repos in response.xpath('//li[contains(@class, "public")]'):
-            yield {
+            item = {
             'name': repos.xpath('.//h3/a/text()').extract_first().strip(),
             'update_time': repos.xpath('.//relative-time/@datetime').extract_first().strip()
             }
+            summary_url = repos.xpath('.//a/@href').extract_first()
+            full_summary_url = response.urljoin(summary_url)
+            
+            request = scrapy.Request(full_summary_url, self.parse_repository)
+            request.meta['item'] = item
+
+            yield request
+            
+            for url in response.xpath('//div[@class="BtnGroup"]/a[text()="Next"]/@href').extract():
+                yield scrapy.Request(url=url, callback=self.parse)
+
+
+    def parse_repository(self, response):
+        item = response.meta['item']
+
+        item['commits'] = response.css('div.overall-summary span::text').extract()[0].strip()
+        item['branches'] = response.css('div.overall-summary span::text').extract()[1].strip()
+        item['releases'] = response.css('div.overall-summary span::text').extract()[2].strip()
+
+        yield item
+
