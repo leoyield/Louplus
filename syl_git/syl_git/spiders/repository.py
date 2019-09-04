@@ -21,8 +21,8 @@ class RepositorySpider(scrapy.Spider):
 
             yield request
             
-            for url in response.xpath('//div[@class="BtnGroup"]/a[text()="Next"]/@href').extract():
-                yield scrapy.Request(url=url, callback=self.parse)
+            for url in response.xpath('//div[@class="BtnGroup"]/a[text()="Next"]/@href'):
+                yield response.follow(url, callback=self.parse)
 
 
     def parse_repository(self, response):
