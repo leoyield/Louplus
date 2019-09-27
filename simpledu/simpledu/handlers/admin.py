@@ -80,7 +80,7 @@ def create_users():
 @admin_required
 def edit_users(user_id):
     user = User.query.get_or_404(user_id) 
-    form = EditUserForm(obj=user)
+    form = EditUserForm(user_id=user_id, obj=user)
     if form.validate_on_submit():
         form.update_user(user)
         flash('用户修改成功', 'success')

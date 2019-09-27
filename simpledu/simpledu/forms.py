@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, IntegerField, HiddenField, RadioField
 from wtforms.validators import Length, Email, EqualTo, Required, URL, NumberRange
 from simpledu.models import db, User, Course
 
@@ -45,11 +45,6 @@ class RegisterForm(FlaskForm):
         db.session.commit()
         return user
 
-    def update_user(self, user):
-        self.populate_obj(user)
-        db.session.add(user)
-        db.session.commit()
-        return user
 
 class CourseForm(FlaskForm):
     name = StringField('课程名称', validators=[Required(), Length(5, 32)])
@@ -76,10 +71,34 @@ class CourseForm(FlaskForm):
         return course
 
 class UserForm(RegisterForm):
-    pass
+    role = RadioField('权限', choices=[(10, 'USER'), (20, 'STAFF'), (30, 'ADMIN')], coerce=int, validators=[Required()])
+    submit = SubmitField('提交')
+
+    def create_user(self):
+        user = User(
+                username=self.username.data,
+                email=self.email.data,
+                password=self.password.data,
+                role=self.role.data
+                )
+        db.session.add(user)
+        db.session.commit()
+        return user
 
 class EditUserForm(RegisterForm):
+    id = HiddenField('')
+    role = RadioField('权限', choices=[(10, 'USER'), (20, 'STAFF'), (30, 'ADMIN')], coerce=int, validators=[Required()])
+    submit = SubmitField('提交')
     def validate_username(self, field):
-        pass
+        if User.query.filter_by(username=field.data).filter(User.id != self.id.data).first():
+            raise ValidationError('用户名已存在')
+
     def validate_email(self, field):
-        pass
+        if User.query.filter_by(email=field.data).filter(User.id != self.id.data).first():
+            raise ValidationError('邮箱已占用')
+    
+    def update_user(self, user):
+        self.populate_obj(user)
+        db.session.add(user)
+        db.session.commit()
+        return user

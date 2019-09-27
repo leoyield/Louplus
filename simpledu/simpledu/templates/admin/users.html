@@ -16,6 +16,7 @@
             <th>ID</th>
             <th>名称</th>
             <th>邮箱</th>
+            <th>权限</th>
             <th>操作</th>
         </tr>
         <tbody>
@@ -24,6 +25,7 @@
             <td>{{ user.id }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
             <td>
                 <div class="btn-group" role="group">
                     <a href="{{ url_for('admin.edit_users', user_id=user.id) }}" type="button" class="btn btn-default">
