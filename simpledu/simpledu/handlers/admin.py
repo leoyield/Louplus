@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash
 from simpledu.decorators import admin_required
-from simpledu.models import Course, User, db
-from simpledu.forms import CourseForm, UserForm, EditUserForm
+from simpledu.models import Course, User, db, Live
+from simpledu.forms import CourseForm, UserForm, EditUserForm, LiveForm
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -95,3 +95,35 @@ def delete_user(user_id):
     db.session.commit()
     flash('成功删除用户', 'success')
     return redirect(url_for('admin.users'))
+
+
+@admin.route('/lives')
+@admin_required
+def lives():
+    page = request.args.get('page', default=1, type=int)
+    pagination = Live.query.paginate(
+            page = page,
+            per_page = current_app.config['ADMIN_PER_PAGE'],
+            error_out = False
+            )
+    return render_template('admin/lives.html', pagination=pagination)
+
+@admin.route('/lives/create', methods=['GET', 'POST'])
+@admin_required
+def create_lives():
+    form = LiveForm()
+    if form.validate_on_submit():
+        form.create_live()
+        flash('直播创建成功', 'success')
+        return redirect(url_for('admin.lives'))
+    return render_template('admin/create_lives.html', form=form)
+
+
+@admin.route('/lives/<int:live_id>/delete')
+@admin_required
+def delete_lives(live_id):
+    live = Live.query.get_or_404(live_id)
+    db.session.delete(live)
+    db.session.commit()
+    flash('成功删除用户', 'success')
+    return redirect(url_for('admin.lives'))
