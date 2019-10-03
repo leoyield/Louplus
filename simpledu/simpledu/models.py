@@ -62,7 +62,7 @@ class Course(Base):
     description = db.Column(db.String(256))
     image_url = db.Column(db.String(256))
     author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))
-    author = db.relationship('User')
+    author = db.relationship('User', backref=db.backref('course', cascade='all, delete-orphan'))
     chapters = db.relationship('Chapter')
 
     @property
@@ -82,7 +82,7 @@ class Chapter(Base):
     vedio_url = db.Column(db.String(256))
     vedio_duration = db.Column(db.String(24))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete="CASCADE"))
-    course = db.relationship('Course')
+    course = db.relationship('Course', backref=db.backref('chapter', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return '<Chapter:{}>'.format(self.name)
@@ -97,7 +97,7 @@ class Live(Base):
     id = db.Column(db.Integer, primary_key=True)
     livename = db.Column(db.String(128), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    user = db.relationship('User')
+    user = db.relationship('User', backref=db.backref('live', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return '<Live:{}>'.format(self.name)
